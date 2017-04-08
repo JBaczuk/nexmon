@@ -32,6 +32,10 @@
  *                                                                         *
  **************************************************************************/
 
+#include <sys/types.h>
+#include <stdint.h>
+#include <stdlib.h>
+
 #define _XOPEN_SOURCE 700
 
 #include <stdio.h>
