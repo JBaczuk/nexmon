@@ -47,14 +47,21 @@ int capabilities = NEX_CAP_MONITOR_MODE | NEX_CAP_MONITOR_MODE_RADIOTAP;
 
 // Hook the call to wlc_ucode_write in wlc_ucode_download
 __attribute__((at(0x1F485C, "", CHIP_VER_BCM4358, FW_VER_7_112_200_17)))
+__attribute__((at(0x1F495C, "", CHIP_VER_BCM4358, FW_VER_7_112_201_3)))
 BLPatch(wlc_ucode_write_compressed, wlc_ucode_write_compressed);
 
 // reduce the amount of ucode memory freed to become part of the heap
 __attribute__((at(0x18235C, "", CHIP_VER_BCM4358, FW_VER_7_112_200_17)))
+__attribute__((at(0x18241C, "", CHIP_VER_BCM4358, FW_VER_7_112_201_3)))
 GenericPatch4(hndrte_reclaim_0_end, PATCHSTART);
 
 extern unsigned char templateram_bin[];
 
 // Moving template ram to another place in the ucode region
 __attribute__((at(0x20B380, "", CHIP_VER_BCM4358, FW_VER_7_112_200_17)))
+__attribute__((at(0x20B480, "", CHIP_VER_BCM4358, FW_VER_7_112_201_3)))
 GenericPatch4(templateram_bin, templateram_bin);
+
+// Avoid AXI error messages
+__attribute__((at(0x94E, "flashpatch", CHIP_VER_BCM4358, FW_VER_ALL)))
+BPatch(skip_axi_error, 0x97A);

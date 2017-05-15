@@ -1,5 +1,5 @@
 GIT_VERSION := $(shell git describe --abbrev=4 --dirty --always --tags)
-FW_PATH=$(NEXMON_ROOT)/firmwares/bcm4358/7_112_200_17_sta
+FW_PATH=$(NEXMON_ROOT)/firmwares/bcm4358/7_112_201_3_sta
 include $(FW_PATH)/definitions.mk
 
 LOCAL_SRCS=$(wildcard src/*.c) src/ucode_compressed.c src/templateram.c
@@ -109,6 +109,14 @@ fw_bcmdhd.bin: init gen/patch.elf $(FW_PATH)/$(RAM_FILE) gen/nexmon.mk gen/flash
 	@printf "\033[0;31m  APPLYING PATCHES\033[0m gen/nexmon.mk => %s (details: log/patches.log)\n" $@
 	$(Q)make -f gen/nexmon.mk >>log/patches.log 2>>log/flashpatches.log
 
+fw_bcmdhd.complete.clean.bin: $(FW_PATH)/$(RAM_FILE) $(FW_PATH)/$(ROM_FILE)
+	dd if=$(FW_PATH)/$(ROM_FILE) of=$@ bs=1 status=none conv=notrunc seek=$$(($(ROMSTART)))
+	dd if=$< of=$@ bs=1 status=none conv=notrunc seek=$$(($(RAMSTART)))
+
+fw_bcmdhd.complete.bin: fw_bcmdhd.bin $(FW_PATH)/$(ROM_FILE)
+	dd if=$(FW_PATH)/$(ROM_FILE) of=$@ bs=1 status=none conv=notrunc seek=$$(($(ROMSTART)))
+	dd if=$< of=$@ bs=1 status=none conv=notrunc seek=$$(($(RAMSTART)))
+
 ###################################################################
 # ucode compression related
 ###################################################################
@@ -151,6 +159,16 @@ ifndef NEXMON_SETUP_ENV
 endif
 
 install-firmware: fw_bcmdhd.bin
+	@printf "\033[0;31m  REMOUNTING /vendor\033[0m\n"
+	$(Q)adb shell 'su -c "mount -o rw,remount /vendor"'
+	@printf "\033[0;31m  COPYING TO PHONE\033[0m %s => /sdcard/%s\n" $< $<
+	$(Q)adb push $< /sdcard/ >> log/adb.log 2>> log/adb.log
+	@printf "\033[0;31m  COPYING\033[0m /sdcard/fw_bcmdhd.bin => /vendor/firmware/fw_bcmdhd.bin\n"
+	$(Q)adb shell 'su -c "cp /sdcard/fw_bcmdhd.bin /vendor/firmware/fw_bcmdhd.bin"'
+	@printf "\033[0;31m  RELOADING FIRMWARE\033[0m\n"
+	$(Q)adb shell 'su -c "ifconfig wlan0 down && ifconfig wlan0 up"'
+
+install-original: $(FW_PATH)/$(RAM_FILE)
 	@printf "\033[0;31m  REMOUNTING /vendor\033[0m\n"
 	$(Q)adb shell 'su -c "mount -o rw,remount /vendor"'
 	@printf "\033[0;31m  COPYING TO PHONE\033[0m %s => /sdcard/%s\n" $< $<

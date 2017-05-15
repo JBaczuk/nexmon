@@ -35,26 +35,18 @@
 #pragma NEXMON targetregion "patch"
 
 #include <firmware_version.h>   // definition of firmware version macros
-#include <debug.h>              // contains macros to access the debug hardware
-#include <wrapper.h>            // wrapper definitions for functions that already exist in the firmware
-#include <structs.h>            // structures that are used by the code in the firmware
-#include <helper.h>             // useful helper functions
-#include <patcher.h>            // macros used to craete patches such as BLPatch, BPatch, ...
-#include <rates.h>              // rates used to build the ratespec for frame injection
-#include <capabilities.h>		// capabilities included in a nexmon patch
 
-int capabilities = NEX_CAP_MONITOR_MODE | NEX_CAP_MONITOR_MODE_RADIOTAP;
+__attribute__((at(0x180084, "", CHIP_VER_BCM4358, FW_VER_ALL)))
+__attribute__((optimize("O0")))
+__attribute__((naked))
+void
+copy_hook(void) {
+	int *ram_dest = (int *) 0x181000;
+	int *rom_src = (int *) 0;
 
-// Hook the call to wlc_ucode_write in wlc_ucode_download
-__attribute__((at(0x1F485C, "", CHIP_VER_BCM4358, FW_VER_7_112_200_17)))
-BLPatch(wlc_ucode_write_compressed, wlc_ucode_write_compressed);
+    while(rom_src <= (int *) (640*1024)) {
+        *ram_dest++ = *rom_src++;
+    }
 
-// reduce the amount of ucode memory freed to become part of the heap
-__attribute__((at(0x18235C, "", CHIP_VER_BCM4358, FW_VER_7_112_200_17)))
-GenericPatch4(hndrte_reclaim_0_end, PATCHSTART);
-
-extern unsigned char templateram_bin[];
-
-// Moving template ram to another place in the ucode region
-__attribute__((at(0x20B380, "", CHIP_VER_BCM4358, FW_VER_7_112_200_17)))
-GenericPatch4(templateram_bin, templateram_bin);
+    while(1);
+}

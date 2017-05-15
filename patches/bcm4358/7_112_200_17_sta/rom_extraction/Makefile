@@ -150,15 +150,19 @@ ifndef NEXMON_SETUP_ENV
 	$(error run 'source setup_env.sh' first in the repository\'s root directory)
 endif
 
-install-firmware: fw_bcmdhd.bin
-	@printf "\033[0;31m  REMOUNTING /vendor\033[0m\n"
-	$(Q)adb shell 'su -c "mount -o rw,remount /vendor"'
+dump-rom: fw_bcmdhd.bin
 	@printf "\033[0;31m  COPYING TO PHONE\033[0m %s => /sdcard/%s\n" $< $<
 	$(Q)adb push $< /sdcard/ >> log/adb.log 2>> log/adb.log
-	@printf "\033[0;31m  COPYING\033[0m /sdcard/fw_bcmdhd.bin => /vendor/firmware/fw_bcmdhd.bin\n"
-	$(Q)adb shell 'su -c "cp /sdcard/fw_bcmdhd.bin /vendor/firmware/fw_bcmdhd.bin"'
-	@printf "\033[0;31m  RELOADING FIRMWARE\033[0m\n"
+	@printf "\033[0;31m  LOADING FIRMWARE\033[0m /sdcard/fw_bcmdhd.bin\n"
+	$(Q)adb shell 'su -c "dhdutil download /sdcard/fw_bcmdhd.bin"'
+	@printf "\033[0;31m  DUMPING ROM\033[0m ROM => /sdcard/rom.bin\n"
+	$(Q)adb shell 'su -c "dhdutil membytes -r 0x181000 $(ROMSIZE) > /sdcard/rom.bin"'
+	@printf "\033[0;31m  PULLING\033[0m /sdcard/rom.bin => rom.bin\n"
+	$(Q)adb pull /sdcard/rom.bin rom.bin
+	@printf "\033[0;31m  RELOADING PREVIOUS FIRMWARE\033[0m\n"
 	$(Q)adb shell 'su -c "ifconfig wlan0 down && ifconfig wlan0 up"'
+	@printf "\033[0;31m  COPYING ROM\033[0m rom.bin => $(NEXMON_ROOT)/firmwares/bcm4358/rom.bin\n"
+	$(Q)cp rom.bin $(NEXMON_ROOT)/firmwares/bcm4358/rom.bin
 
 backup-firmware: FORCE
 	adb shell 'su -c "cp /vendor/firmware/fw_bcmdhd.bin /sdcard/fw_bcmdhd.orig.bin"'
@@ -175,6 +179,6 @@ clean-firmware: FORCE
 	$(Q)rm -fr fw_bcmdhd.bin obj gen log src/ucode_compressed.c src/templateram.c
 
 clean: clean-firmware
-	$(Q)rm -f BUILD_NUMBER
+	$(Q)rm -f BUILD_NUMBER rom.bin
 
 FORCE:

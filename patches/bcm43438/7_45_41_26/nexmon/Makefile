@@ -1,6 +1,6 @@
 SHELL = /bin/bash
 GIT_VERSION := $(shell git describe --abbrev=4 --dirty --always --tags)
-FW_PATH=$(NEXMON_ROOT)/firmwares/bcm43438/7_45_41_26
+include ../version.mk
 include $(FW_PATH)/definitions.mk
 
 LOCAL_SRCS=$(wildcard src/*.c) src/ucode_compressed.c src/templateram.c
@@ -196,5 +196,6 @@ ifeq ($(shell uname -m),armv7l)
 	@printf "\033[0;31m  CLEANING DRIVER\033[0m\n" $@
 	$(Q)make -C /lib/modules/$(shell uname -r)/build M=$$PWD/brcmfmac clean
 endif
+	$(Q)rm -f BUILD_NUMBER
 
 FORCE:
