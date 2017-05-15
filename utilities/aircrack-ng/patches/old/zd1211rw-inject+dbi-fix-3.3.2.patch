@@ -36,14 +36,14 @@
  			stats.flag |= RX_FLAG_FAILED_FCS_CRC;
 @@ -1060,6 +1066,7 @@
  	stats.freq = zd_channels[_zd_chip_get_channel(&mac->chip) - 1].center_freq;
- 	stats.band = IEEE80211_BAND_2GHZ;
+ 	stats.band = NL80211_BAND_2GHZ;
  	stats.signal = zd_check_signal(hw, status->signal_strength);
 +	stats.signal = stats.signal - 90;
  
  	rate = zd_rx_rate(buffer, status);
  
 @@ -1388,7 +1395,7 @@
- 	hw->wiphy->bands[IEEE80211_BAND_2GHZ] = &mac->band;
+ 	hw->wiphy->bands[NL80211_BAND_2GHZ] = &mac->band;
  
  	hw->flags = IEEE80211_HW_RX_INCLUDES_FCS |
 -		    IEEE80211_HW_SIGNAL_UNSPEC |

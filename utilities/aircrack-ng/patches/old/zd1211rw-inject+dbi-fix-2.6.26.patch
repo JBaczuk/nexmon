@@ -36,7 +36,7 @@
  			stats.flag |= RX_FLAG_FAILED_FCS_CRC;
 @@ -828,7 +834,8 @@ int zd_mac_rx(struct ieee80211_hw *hw, c
  	stats.freq = zd_channels[_zd_chip_get_channel(&mac->chip) - 1].center_freq;
- 	stats.band = IEEE80211_BAND_2GHZ;
+ 	stats.band = NL80211_BAND_2GHZ;
  	stats.signal = status->signal_strength;
 -
 +	stats.signal = stats.signal - 90;
@@ -45,7 +45,7 @@
  
  	/* todo: return index in the big switches in zd_rx_rate instead */
 @@ -1155,7 +1162,7 @@ struct ieee80211_hw *zd_mac_alloc_hw(str
- 	hw->wiphy->bands[IEEE80211_BAND_2GHZ] = &mac->band;
+ 	hw->wiphy->bands[NL80211_BAND_2GHZ] = &mac->band;
  
  	hw->flags = IEEE80211_HW_RX_INCLUDES_FCS |
 -		    IEEE80211_HW_SIGNAL_UNSPEC;
