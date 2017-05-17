@@ -142,7 +142,7 @@ static struct ieee80211_rate __wl_rates[] = {
 }
 
 #define CHAN5G(_channel) {					\
-	.band			= IEEE80211_BAND_5GHZ,		\
+	.band			= NL80211_BAND_5GHZ,		\
 	.center_freq		= 5000 + (5 * (_channel)),	\
 	.hw_value		= (_channel),			\
 	.flags			= IEEE80211_CHAN_DISABLED,	\
@@ -176,7 +176,7 @@ static const struct ieee80211_supported_band __wl_band_2ghz = {
 };
 
 static const struct ieee80211_supported_band __wl_band_5ghz = {
-	.band = IEEE80211_BAND_5GHZ,
+	.band = NL80211_BAND_5GHZ,
 	.bitrates = wl_a_rates,
 	.n_bitrates = wl_a_rates_size,
 };
@@ -285,7 +285,7 @@ static u16 chandef_to_chanspec(struct brcmu_d11inf *d11inf,
 	case NL80211_BAND_2GHZ:
 		ch_inf.band = BRCMU_CHAN_BAND_2G;
 		break;
-	case IEEE80211_BAND_5GHZ:
+	case NL80211_BAND_5GHZ:
 		ch_inf.band = BRCMU_CHAN_BAND_5G;
 		break;
 	case IEEE80211_BAND_60GHZ:
@@ -2660,7 +2660,7 @@ static s32 brcmf_inform_single_bss(struct brcmf_cfg80211_info *cfg,
 	if (channel <= CH_MAX_2G_CHANNEL)
 		band = wiphy->bands[NL80211_BAND_2GHZ];
 	else
-		band = wiphy->bands[IEEE80211_BAND_5GHZ];
+		band = wiphy->bands[NL80211_BAND_5GHZ];
 
 	freq = ieee80211_channel_to_frequency(channel, band->band);
 	notify_channel = ieee80211_get_channel(wiphy, freq);
@@ -2769,7 +2769,7 @@ static s32 brcmf_inform_ibss(struct brcmf_cfg80211_info *cfg,
 	if (ch.band == BRCMU_CHAN_BAND_2G)
 		band = wiphy->bands[NL80211_BAND_2GHZ];
 	else
-		band = wiphy->bands[IEEE80211_BAND_5GHZ];
+		band = wiphy->bands[NL80211_BAND_5GHZ];
 
 	freq = ieee80211_channel_to_frequency(ch.chnum, band->band);
 	cfg->channel = freq;
@@ -4937,7 +4937,7 @@ brcmf_bss_roaming_done(struct brcmf_cfg80211_info *cfg,
 	if (ch.band == BRCMU_CHAN_BAND_2G)
 		band = wiphy->bands[NL80211_BAND_2GHZ];
 	else
-		band = wiphy->bands[IEEE80211_BAND_5GHZ];
+		band = wiphy->bands[NL80211_BAND_5GHZ];
 
 	freq = ieee80211_channel_to_frequency(ch.chnum, band->band);
 	notify_channel = ieee80211_get_channel(wiphy, freq);
@@ -5435,7 +5435,7 @@ static int brcmf_construct_chaninfo(struct brcmf_cfg80211_info *cfg,
 	if (band)
 		for (i = 0; i < band->n_channels; i++)
 			band->channels[i].flags = IEEE80211_CHAN_DISABLED;
-	band = wiphy->bands[IEEE80211_BAND_5GHZ];
+	band = wiphy->bands[NL80211_BAND_5GHZ];
 	if (band)
 		for (i = 0; i < band->n_channels; i++)
 			band->channels[i].flags = IEEE80211_CHAN_DISABLED;
@@ -5448,7 +5448,7 @@ static int brcmf_construct_chaninfo(struct brcmf_cfg80211_info *cfg,
 		if (ch.band == BRCMU_CHAN_BAND_2G) {
 			band = wiphy->bands[NL80211_BAND_2GHZ];
 		} else if (ch.band == BRCMU_CHAN_BAND_5G) {
-			band = wiphy->bands[IEEE80211_BAND_5GHZ];
+			band = wiphy->bands[NL80211_BAND_5GHZ];
 		} else {
 			brcmf_err("Invalid channel Spec. 0x%x.\n", ch.chspec);
 			continue;
@@ -5599,7 +5599,7 @@ static void brcmf_get_bwcap(struct brcmf_if *ifp, u32 bw_cap[])
 		band = WLC_BAND_5G;
 		err = brcmf_fil_iovar_int_get(ifp, "bw_cap", &band);
 		if (!err) {
-			bw_cap[IEEE80211_BAND_5GHZ] = band;
+			bw_cap[NL80211_BAND_5GHZ] = band;
 			return;
 		}
 		WARN_ON(1);
@@ -5617,11 +5617,11 @@ static void brcmf_get_bwcap(struct brcmf_if *ifp, u32 bw_cap[])
 		bw_cap[NL80211_BAND_2GHZ] |= WLC_BW_40MHZ_BIT;
 		/* fall-thru */
 	case WLC_N_BW_20IN2G_40IN5G:
-		bw_cap[IEEE80211_BAND_5GHZ] |= WLC_BW_40MHZ_BIT;
+		bw_cap[NL80211_BAND_5GHZ] |= WLC_BW_40MHZ_BIT;
 		/* fall-thru */
 	case WLC_N_BW_20ALL:
 		bw_cap[NL80211_BAND_2GHZ] |= WLC_BW_20MHZ_BIT;
-		bw_cap[IEEE80211_BAND_5GHZ] |= WLC_BW_20MHZ_BIT;
+		bw_cap[NL80211_BAND_5GHZ] |= WLC_BW_20MHZ_BIT;
 		break;
 	default:
 		brcmf_err("invalid mimo_bw_cap value\n");
@@ -5699,7 +5699,7 @@ static int brcmf_setup_wiphybands(struct wiphy *wiphy)
 	}
 	brcmf_dbg(INFO, "nmode=%d, vhtmode=%d, bw_cap=(%d, %d)\n",
 		  nmode, vhtmode, bw_cap[NL80211_BAND_2GHZ],
-		  bw_cap[IEEE80211_BAND_5GHZ]);
+		  bw_cap[NL80211_BAND_5GHZ]);
 
 	err = brcmf_fil_iovar_int_get(ifp, "rxchain", &rxchain);
 	if (err) {
@@ -6016,7 +6016,7 @@ static int brcmf_setup_wiphy(struct wiphy *wiphy, struct brcmf_if *ifp)
 			}
 
 			band->n_channels = ARRAY_SIZE(__wl_5ghz_channels);
-			wiphy->bands[IEEE80211_BAND_5GHZ] = band;
+			wiphy->bands[NL80211_BAND_5GHZ] = band;
 		}
 	}
 	err = brcmf_setup_wiphybands(wiphy);
@@ -6233,9 +6233,9 @@ static void brcmf_free_wiphy(struct wiphy *wiphy)
 		kfree(wiphy->bands[NL80211_BAND_2GHZ]->channels);
 		kfree(wiphy->bands[NL80211_BAND_2GHZ]);
 	}
-	if (wiphy->bands[IEEE80211_BAND_5GHZ]) {
-		kfree(wiphy->bands[IEEE80211_BAND_5GHZ]->channels);
-		kfree(wiphy->bands[IEEE80211_BAND_5GHZ]);
+	if (wiphy->bands[NL80211_BAND_5GHZ]) {
+		kfree(wiphy->bands[NL80211_BAND_5GHZ]->channels);
+		kfree(wiphy->bands[NL80211_BAND_5GHZ]);
 	}
 	wiphy_free(wiphy);
 }
