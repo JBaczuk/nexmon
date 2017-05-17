@@ -755,7 +755,7 @@ s32 brcmf_notify_escan_complete(struct brcmf_cfg80211_info *cfg,
 			info.aborted = false;
 		}
 		// END TODO
-		cfg80211_scan_done(scan_request, info);
+		cfg80211_scan_done(scan_request, &info);
 	}
 	if (!test_and_clear_bit(BRCMF_SCAN_STATUS_BUSY, &cfg->scan_status))
 		brcmf_dbg(SCAN, "Scan complete, probably P2P scan\n");
