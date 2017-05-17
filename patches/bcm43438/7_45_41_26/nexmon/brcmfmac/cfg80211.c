@@ -627,6 +627,10 @@ brcmf_cfg80211_nexmon_set_channel(struct wiphy *wiphy,struct cfg80211_chan_def *
     return 0;
 }
 
+struct cfg80211_scan_info info = {
+	.aborted = false,
+};
+
 static struct wireless_dev *brcmf_cfg80211_add_iface(struct wiphy *wiphy,
 						     const char *name,
 						     unsigned char name_assign_type,
@@ -744,9 +748,6 @@ s32 brcmf_notify_escan_complete(struct brcmf_cfg80211_info *cfg,
 		brcmf_dbg(SCAN, "ESCAN Completed scan: %s\n",
 			  aborted ? "Aborted" : "Done");
 		// TODO: The following was added to adapt to new raspberry pi function cfg80211_scan_done
-		struct cfg80211_scan_info info = {
-			.aborted = false,
-		};
 		if(aborted) {
 			info.aborted = true,
 		}
