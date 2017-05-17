@@ -749,10 +749,10 @@ s32 brcmf_notify_escan_complete(struct brcmf_cfg80211_info *cfg,
 			  aborted ? "Aborted" : "Done");
 		// TODO: The following was added to adapt to new raspberry pi function cfg80211_scan_done
 		if(aborted) {
-			info.aborted = true,
+			info.aborted = true;
 		}
 		else {
-			info.aborted = false,
+			info.aborted = false;
 		}
 		// END TODO
 		cfg80211_scan_done(scan_request, aborted);
