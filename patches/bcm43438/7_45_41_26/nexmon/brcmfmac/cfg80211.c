@@ -743,6 +743,17 @@ s32 brcmf_notify_escan_complete(struct brcmf_cfg80211_info *cfg,
 	} else if (scan_request) {
 		brcmf_dbg(SCAN, "ESCAN Completed scan: %s\n",
 			  aborted ? "Aborted" : "Done");
+		// TODO: The following was added to adapt to new raspberry pi function cfg80211_scan_done
+		struct cfg80211_scan_info info = {
+			.aborted = false,
+		};
+		if(aborted) {
+			info.aborted = true,
+		}
+		else {
+			info.aborted = false,
+		}
+		// END TODO
 		cfg80211_scan_done(scan_request, aborted);
 	}
 	if (!test_and_clear_bit(BRCMF_SCAN_STATUS_BUSY, &cfg->scan_status))
@@ -6272,7 +6283,7 @@ struct brcmf_cfg80211_info *brcmf_cfg80211_attach(struct brcmf_pub *drvr,
 	cfg->pub = drvr;
 	init_vif_event(&cfg->vif_event);
 	INIT_LIST_HEAD(&cfg->vif_list);
-    
+
 	vif = brcmf_alloc_vif(cfg, NL80211_IFTYPE_STATION, false);
 	if (IS_ERR(vif))
 		goto wiphy_out;
