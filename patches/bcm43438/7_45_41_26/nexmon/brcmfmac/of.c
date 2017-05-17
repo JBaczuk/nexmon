@@ -17,7 +17,7 @@
 #include <linux/of.h>
 #include <linux/of_irq.h>
 #include <linux/mmc/card.h>
-#include <linux/platform_data/brcmfmac-sdio.h>
+#include <linux/platform_data/brcmfmac.h>
 #include <linux/mmc/sdio_func.h>
 
 #include <defs.h>

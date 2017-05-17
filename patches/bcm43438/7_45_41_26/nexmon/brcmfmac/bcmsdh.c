@@ -28,7 +28,7 @@
 #include <linux/mmc/card.h>
 #include <linux/mmc/host.h>
 #include <linux/platform_device.h>
-#include <linux/platform_data/brcmfmac-sdio.h>
+#include <linux/platform_data/brcmfmac.h>
 #include <linux/pm_runtime.h>
 #include <linux/suspend.h>
 #include <linux/errno.h>

@@ -33,7 +33,7 @@
 #include <linux/bcma/bcma.h>
 #include <linux/debugfs.h>
 #include <linux/vmalloc.h>
-#include <linux/platform_data/brcmfmac-sdio.h>
+#include <linux/platform_data/brcmfmac.h>
 #include <linux/moduleparam.h>
 #include <asm/unaligned.h>
 #include <defs.h>
@@ -4409,28 +4409,28 @@ write_ram_to_buffer(void) {
     //Reset buffer
     my_rom_buffer[0] = 0;
     my_rom_buffer_len = 0;
-	
+
 	sdio_claim_host(my_sdio->sdiodev->func[1]);
 	brcmf_sdio_bus_sleep(my_sdio, false, false);
     brcmf_sdio_clkctl(my_sdio, CLK_AVAIL, false);
-   
+
     while(address >= start_addr && address < end_addr) {
         brcmf_err("NEXMON rom loop, current address: 0x%x, my_rom_buffer_len: %d\n", address, my_rom_buffer_len);
 
         brcmf_sdiod_ramrw(my_sdio->sdiodev, false, address, data, chunk_sz);
 
         memcpy(&(my_rom_buffer[my_rom_buffer_len]), data, (size_t) chunk_sz);
-                
+
         my_rom_buffer_len += chunk_sz;
         address += chunk_sz;
 
     }
-    
+
     print_hex_dump_bytes("", DUMP_PREFIX_NONE, my_rom_buffer, 0x100);
-	
+
     my_sdio->alp_only = false;
     sdio_release_host(my_sdio->sdiodev->func[1]);
-    
+
     return 0;
 
 }
